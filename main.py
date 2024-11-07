@@ -9,7 +9,7 @@ import threading
 import os
 from pyparrot.Bebop import Bebop
 from Model.Keypoint_classifier import KeyPointClassifier 
-#this is a test commit
+
 # Threaded Video Capture class to ensure non-blocking camera input
 class VideoStream:
     def __init__(self, src=0, width=320, height=240, fps=30):
@@ -212,7 +212,7 @@ def main():
     mp_drawing = mp.solutions.drawing_utils
     hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
-    processing_interval = 0.01  # Process gestures every 10ms
+    processing_interval = 0.1  # Process gestures every 10ms
     last_processed_time = 0
 
     # while True:
