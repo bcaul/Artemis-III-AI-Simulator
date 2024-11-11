@@ -9,9 +9,10 @@ class DroneController:
         self.current_altitude = 0
 
     def initialize(self):
-        print("Connecting")
+        """Connect to the drone and initialize its state."""
+        print("Connecting to drone...")
         if self.bebop.connect(10):
-            print("Success")
+            print("Connected successfully.")
             self.bebop.smart_sleep(5)
             self.bebop.ask_for_state_update()
             return True
@@ -19,40 +20,62 @@ class DroneController:
             print("Failed to connect.")
             return False
 
-    def control_with_gesture(self, hand_sign_id, current_time):
-        if hand_sign_id == 0:  # Open Hand - Takeoff or Ascend
-            if not self.is_flying and current_time - self.last_takeoff_time > TAKEOFF_COOLDOWN:
-                print('Open Hand - Takeoff')
-                self.bebop.safe_takeoff(10)
-                self.last_takeoff_time = current_time
-                self.is_flying = True
+    def can_take_action(self, current_time):
+        """Check if the cooldown period has elapsed."""
+        return current_time - self.last_takeoff_time > TAKEOFF_COOLDOWN
+
+    def takeoff_or_ascend(self, current_time):
+        """Handle takeoff or ascending actions based on current state."""
+        if not self.is_flying and self.can_take_action(current_time):
+            print("Open Hand - Takeoff")
+            self.bebop.safe_takeoff(10)
+            self.is_flying = True
+            self.current_altitude = 0
+        elif self.is_flying:
+            print("Open Hand - Ascending")
+            self.bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=50, duration=1)
+            self.current_altitude += 50
+        self.last_takeoff_time = current_time
+
+    def descend_or_land(self):
+        """Handle descending or landing actions based on altitude."""
+        if self.is_flying:
+            print("Closed Hand - Descending")
+            self.bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-50, duration=1)
+            self.current_altitude -= 50
+            if self.current_altitude <= LANDING_RANGE:
+                print("Landing command executed")
+                self.bebop.safe_land(10)
                 self.current_altitude = 0
-            elif self.is_flying:
-                print("Open Hand - Ascending")
-                self.bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=50, duration=1)
-                self.current_altitude += 50
+                self.is_flying = False
 
-        elif hand_sign_id == 1:  # Closed Hand - Descend
-            if self.is_flying:
-                print('Closed Hand - Descending')
-                self.bebop.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-50, duration=1)
-                self.current_altitude -= 50
-                if self.current_altitude <= LANDING_RANGE:
-                    print('Landing command executed')
-                    self.bebop.safe_land(10)
-                    self.current_altitude = 0
-                    self.is_flying = False
+    def move_forward(self, current_time):
+        """Move the drone forward if flying and cooldown has passed."""
+        if self.is_flying and self.can_take_action(current_time):
+            print("Pointing - Going Forward")
+            self.bebop.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=1)
+            self.last_takeoff_time = current_time
 
-        elif hand_sign_id == 2:  # Pointing Gesture - Forward
-            if self.is_flying and current_time - self.last_takeoff_time > TAKEOFF_COOLDOWN:
-                print("Pointing - Going Forward")
-                self.bebop.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=1)
-                self.last_takeoff_time = current_time
+    def move_backward(self, current_time):
+        """Move the drone backward if flying and cooldown has passed."""
+        if self.is_flying and self.can_take_action(current_time):
+            print("Ok - Going Backwards")
+            self.bebop.fly_direct(roll=0, pitch=-50, yaw=0, vertical_movement=0, duration=1)
+            self.last_takeoff_time = current_time
 
-        elif hand_sign_id == 3:  # Ok Gesture - Backwards
-            if self.is_flying and current_time - self.last_takeoff_time > TAKEOFF_COOLDOWN:
-                print("Ok - Going Backwards")
-                self.bebop.fly_direct(roll=0, pitch=-50, yaw=0, vertical_movement=0, duration=1)
+    def control_with_gesture(self, hand_sign_id, current_time):
+        """Control the drone based on the detected gesture."""
+        actions = {
+            0: self.takeoff_or_ascend,
+            1: self.descend_or_land,
+            2: self.move_forward,
+            3: self.move_backward
+        }
+        
+        action = actions.get(hand_sign_id)
+        if action:
+            action(current_time)
 
     def disconnect(self):
+        """Disconnect from the drone."""
         self.bebop.disconnect()

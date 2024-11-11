@@ -64,7 +64,7 @@ Several constants can be configured in `constants.py`:
 - `TAKEOFF_COOLDOWN`: Cooldown time between commands, in seconds.
 - `LANDING_RANGE`: The distance threshold for landing.
 - `PROCESSING_INTERVAL`: Time between gesture processing cycles.
-- `KEYPOINT_CSV_PATH` and `KEYPOINT_LABEL_CSV_PATH`: Paths for saving landmark data and accessing labels.
+- `KEYPOINT_CSV_OUTPUT_PATH` and `KEYPOINT_CLASSES`: Paths for saving landmark data and accessing labels.
 
 Adjust these parameters to modify performance, logging, or response times.
 
