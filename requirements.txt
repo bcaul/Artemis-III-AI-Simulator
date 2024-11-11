@@ -1,0 +1,8 @@
+opencv-python
+mediapipe
+numpy
+pyparrot
+zeroconf
+tensorflow
+scikit-learn
+seaborn
