@@ -6,7 +6,6 @@ def logging_csv(key, landmark_list):
     number_hit = -1
     if 48 <= key <= 57:  # Keys 0-9
       number_hit = key - 48
-    print(number_hit)
     # Only log data if the label number exists in KEYPOINT_CLASSES
     if number_hit in KEYPOINT_CLASSES:
         with open(KEYPOINT_CSV_OUTPUT_PATH, 'a', newline="") as f:
