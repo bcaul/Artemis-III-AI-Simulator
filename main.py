@@ -2,18 +2,17 @@
 import cv2
 import time
 import mediapipe as mp
+from Model.Keypoint_classifier import KeyPointClassifier
 from video_stream import VideoStream
 from drone_control import DroneController
-from classifier import GestureClassifier
 from gesture_processing import logging_csv
-from constants import PROCESSING_INTERVAL
+from constants import KEYPOINT_CLASSES, PROCESSING_INTERVAL
 
 def main():
     # Initialize the drone
     drone_controller = DroneController()
     drone_active = drone_controller.initialize()
 
-    classifier = GestureClassifier()
     video_stream = VideoStream(width=640, height=480, fps=15).start()
 
     last_processed_time = 0
@@ -60,10 +59,12 @@ def main():
                     # TODO -- Enhance this code by displaying the training mode ON/OFF ON the video_stream.
                     if training_mode: logging_csv(key, processed_landmarks)
 
+
+                    gesture_id = KeyPointClassifier(landmark_list)
+                    gesture_name = KEYPOINT_CLASSES.get(gesture_id, "Unknown")  # Return "Unknown" if gesture_id not found
+
                     # TODO -- Enhance this code by displaying the detected gesture ON the video_stream.
                     # print(f"Detected gesture: {gesture_name}")
-                    # Predict gesture and map to class name
-                    gesture_name = classifier.predict(processed_landmarks)
                     
                     # Control the drone based on predicted gesture
                     if drone_active:

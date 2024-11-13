@@ -12,7 +12,3 @@ KEYPOINT_CLASSES = {
 }
 
 
-
-
-
-
