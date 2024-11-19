@@ -8,7 +8,9 @@ KEYPOINT_CLASSES = {
     1: "Closed fist",
     2: "Pointer",
     3: "OK",
-    4: "Peace sign"
+    4: "Peace sign",
+    5: "F Finger",
+    6: "Shaka"
 }
 
 
