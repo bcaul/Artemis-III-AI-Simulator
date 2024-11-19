@@ -23,18 +23,22 @@ def main():
     mp_drawing = mp.solutions.drawing_utils
     hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
+    # Initialize KeyPointClassifier
+    keypoint_classifier = KeyPointClassifier()
+
     # Main loop
     while True:
         img = video_stream.read()
         key = cv2.waitKey(10)
 
         # ESC or 'q' to quit
-        if key == 27 or key == ord('q'):  
+        if key == 27 or key == ord('q'):
             video_stream.stop()
             break
 
         # 't' toggles training mode
-        if key == ord('t'): training_mode = not training_mode
+        if key == ord('t'): 
+            training_mode = not training_mode
 
         # Process gestures at regular intervals
         current_time = time.time()
@@ -56,16 +60,21 @@ def main():
                     mp_drawing.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
                     # Log landmarks if training mode is active
-                    # TODO -- Enhance this code by displaying the training mode ON/OFF ON the video_stream.
-                    if training_mode: logging_csv(key, processed_landmarks)
+                    if training_mode: 
+                        logging_csv(key, processed_landmarks)
 
+                    # Classify the gesture
+                    try:
+                        gesture_id = keypoint_classifier(processed_landmarks)  # Pass processed landmarks
+                        gesture_name = KEYPOINT_CLASSES.get(gesture_id, "Unknown")  # Return "Unknown" if gesture_id not found
+                        print(f"Detected gesture: {gesture_name}")
+                    except ValueError as e:
+                        print("Error during classification:", e)
+                        gesture_name = "Error"
 
-                    gesture_id = KeyPointClassifier(landmark_list)
-                    gesture_name = KEYPOINT_CLASSES.get(gesture_id, "Unknown")  # Return "Unknown" if gesture_id not found
+                    # Display detected gesture on the video stream
+                    cv2.putText(img, f"Gesture: {gesture_name}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-                    # TODO -- Enhance this code by displaying the detected gesture ON the video_stream.
-                    # print(f"Detected gesture: {gesture_name}")
-                    
                     # Control the drone based on predicted gesture
                     if drone_active:
                         drone_controller.control_with_gesture(gesture_name, current_time)
@@ -74,7 +83,8 @@ def main():
         cv2.imshow('Drone Control', img)
 
     # Cleanup
-    if drone_active: drone_controller.disconnect()
+    if drone_active: 
+        drone_controller.disconnect()
     video_stream.stop()
     cv2.destroyAllWindows()
 
