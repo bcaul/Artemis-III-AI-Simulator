@@ -4,7 +4,7 @@ import time
 import mediapipe as mp
 from Model.Keypoint_classifier import KeyPointClassifier
 from video_stream import VideoStream
-from drone_control import DroneController
+from airsim_drone_control import DroneController
 from gesture_processing import logging_csv
 from constants import KEYPOINT_CLASSES, PROCESSING_INTERVAL
 
@@ -67,7 +67,7 @@ def main():
                     try:
                         gesture_id = keypoint_classifier(processed_landmarks)  # Pass processed landmarks
                         gesture_name = KEYPOINT_CLASSES.get(gesture_id, "Unknown")  # Return "Unknown" if gesture_id not found
-                        print(f"Detected gesture: {gesture_name}")
+                        print(f"Detected gesture: {gesture_name} (ID: {gesture_id})")
                     except ValueError as e:
                         print("Error during classification:", e)
                         gesture_name = "Error"
@@ -77,7 +77,7 @@ def main():
 
                     # Control the drone based on predicted gesture
                     if drone_active:
-                        drone_controller.control_with_gesture(gesture_name, current_time)
+                        drone_controller.control_with_gesture(gesture_id, current_time)
 
         # Display the image with annotations
         cv2.imshow('Drone Control', img)
