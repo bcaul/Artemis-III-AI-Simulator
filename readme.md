@@ -2,7 +2,7 @@
 
 This is an adaptation of the [Artemis III AI Vision](https://github.com/UoM-Robotics-Society/Artemis-III-AI-Vision). It allows the commands for the drone to be simulated in Unreal Engine 4.27 using Airsim.
 
-This project enables a Parrot Bebop drone to be controlled via hand gestures using a live video feed and hand tracking through MediaPipe. The hand gestures are recognized and translated into commands for the drone, allowing for intuitive drone control. The project is adapted from [Kazuhito00's hand gesture recognition](https://github.com/kinivi/hand-gesture-recognition-mediapipe).
+This project enables a Parrot Bebop drone to be controlled via hand gestures using a live video feed and hand tracking through MediaPipe. The hand gestures are recognized and translated into commands for the drone, allowing for intuitive drone control. The project is adapted from [Kazuhito00's hand gesture recognition]([https://github.com/kinivi/hand-gesture-recognition-mediapipe](https://github.com/bcaul/Artemis-III-AI-Vision)).
 
 ## Features
 
